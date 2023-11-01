@@ -13,9 +13,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	exec := NewExecutor(100, []int{1000, 10_000, 100_000})
+	exec := NewExecutor(100, []int{1000, 10_000, 100_000, 1_000_000})
 
-	exec.UseSortingFn(STANDARD_SORT)
+	exec.UseSortingFn(RADIX_SORT)
 	out.Write(data.NewFormater(exec.UseGenerator(RANDOM).Run()))
 	out.Write(data.NewFormater(exec.UseGenerator(NEAR_SORTED).Run()))
 	out.Write(data.NewFormater(exec.UseGenerator(SORTED).Run()))

@@ -19,6 +19,7 @@ const (
 
 const (
 	STANDARD_SORT string = "standard_sort"
+	RADIX_SORT    string = "radix_sort"
 )
 
 type Executor struct {
@@ -67,6 +68,8 @@ func (e *Executor) sort(s []time.Time) []time.Time {
 	switch e.method {
 	case STANDARD_SORT:
 		return sorting.StandartSort(s)
+	case RADIX_SORT:
+		return sorting.RadixSort(s)
 	}
 
 	return s
