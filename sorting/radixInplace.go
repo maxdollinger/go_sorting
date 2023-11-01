@@ -1,6 +1,7 @@
 package sorting
 
 import (
+	"sort"
 	"time"
 )
 
@@ -12,6 +13,10 @@ func RadixSortInplace(s []time.Time) []time.Time {
 }
 
 func radixInplace(s []time.Time, faktor int) {
+
+	if sort.SliceIsSorted(s, func(i, j int) bool { return s[i].Unix() < s[j].Unix() }) {
+		return
+	}
 
 	C := [BUCKET_SIZE]int{}
 	for i := range s {
@@ -38,7 +43,11 @@ func radixInplace(s []time.Time, faktor int) {
 	if faktor > 0 {
 		for i := range C {
 			if C[i] > 0 {
-				radixInplace(s[(T[i]-C[i]):T[i]], faktor)
+				if C[i] > 1000 {
+					radixInplace(s[(T[i]-C[i]):T[i]], faktor)
+				} else {
+					StandartSort(s[(T[i] - C[i]):T[i]])
+				}
 			}
 		}
 	}

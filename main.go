@@ -13,12 +13,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	exec := NewExecutor(100, []int{1000, 10_000, 100_000, 1_000_000})
+	executor := NewExecutor(100, []int{1000, 10_000, 100_000, 1_000_000})
 
-	exec.UseSortingFn(RADIX_SORT)
-	out.Write(data.NewFormater(exec.UseGenerator(RANDOM).Run()))
-	out.Write(data.NewFormater(exec.UseGenerator(NEAR_SORTED).Run()))
-	out.Write(data.NewFormater(exec.UseGenerator(SORTED).Run()))
-	out.Write(data.NewFormater(exec.UseGenerator(REVERSED).Run()))
-	out.Write(data.NewFormater(exec.UseGenerator(DBL_SORTED).Run()))
+	testSortingFn(RADIX_SORT_INPLACE, executor, out)
+	testSortingFn(STANDARD_SORT, executor, out)
+}
+
+func testSortingFn(fn string, e *Executor, o *Output) {
+	e.UseSortingFn(fn)
+	o.Write(data.NewFormater(e.UseGenerator(RANDOM).Run()))
+	// o.Write(data.NewFormater(e.UseGenerator(NEAR_SORTED).Run()))
+	o.Write(data.NewFormater(e.UseGenerator(SORTED).Run()))
+	// o.Write(data.NewFormater(e.UseGenerator(REVERSED).Run()))
+	// o.Write(data.NewFormater(e.UseGenerator(DBL_SORTED).Run()))
 }
