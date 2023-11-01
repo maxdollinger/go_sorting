@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/maxdolliger/timesort/data"
 )
 
 type Output struct {
@@ -10,7 +12,7 @@ type Output struct {
 }
 
 func NewOutput(name string) (*Output, error) {
-	f, err := os.OpenFile(name, (os.O_CREATE + os.O_APPEND + os.O_WRONLY), 644)
+	f, err := os.OpenFile(name, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 6644)
 	if err != nil {
 		return nil, err
 	}
@@ -25,11 +27,8 @@ func (o *Output) Close() {
 	o.file.Close()
 }
 
-func (o *Output) WriteFile(str string) error {
-	_, err := o.file.WriteString(str)
+func (o *Output) Write(form *data.Formater) error {
+	fmt.Print(form)
+	_, err := o.file.WriteString(form.String())
 	return err
-}
-
-func (o *Output) WriteStdOut(str string) {
-	fmt.Println(str)
 }
