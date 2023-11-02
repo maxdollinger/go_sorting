@@ -3,6 +3,7 @@ package data
 import (
 	"math"
 	"runtime"
+	"sort"
 	"time"
 )
 
@@ -66,8 +67,8 @@ func (e *Evaluation) ExectimeMedian() time.Duration {
 	}
 }
 
-func (e *Evaluation) ExectimeMin() time.Duration {
-	min := time.Nanosecond
+func (e *Evaluation) ExectimeFastest() time.Duration {
+	min := time.Hour
 	for i := range e.ExectimeRaw {
 		if min > e.ExectimeRaw[i] {
 			min = e.ExectimeRaw[i]
@@ -77,8 +78,8 @@ func (e *Evaluation) ExectimeMin() time.Duration {
 	return min
 }
 
-func (e *Evaluation) ExectimeMax() time.Duration {
-	max := time.Hour
+func (e *Evaluation) ExectimeSlowest() time.Duration {
+	max := time.Nanosecond
 	for i := range e.ExectimeRaw {
 		if max < e.ExectimeRaw[i] {
 			max = e.ExectimeRaw[i]
@@ -89,6 +90,26 @@ func (e *Evaluation) ExectimeMax() time.Duration {
 }
 
 func (e *Evaluation) ExectimeP(p int) time.Duration {
-	p = int(math.Floor(float64(len(e.ExectimeRaw) / 100 * p)))
+	l := len(e.ExectimeRaw)
+	p = int(math.Floor(float64(l / 100 * p)))
+	s := make([]time.Duration, l)
+	for i := range e.ExectimeRaw {
+		s[i] = e.ExectimeRaw[i]
+	}
+
+	sort.Slice(s, func(i, j int) bool { return s[i] < s[j] })
+
 	return e.ExectimeRaw[p]
+}
+
+func (e *Evaluation) ExectimeSD() time.Duration {
+	mean := e.ExectimeMean()
+	devSqSum := float64(0)
+	for _, v := range e.ExectimeRaw {
+		devSqSum += math.Pow(float64(v-mean), 2)
+	}
+
+	vari := devSqSum / float64(len(e.ExectimeRaw))
+
+	return time.Duration(math.Sqrt(vari))
 }
