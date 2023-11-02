@@ -18,7 +18,7 @@ func NewEvaluation(size int, dist, method string) *Evaluation {
 	return &Evaluation{Size: size, Distribution: dist, Method: method}
 }
 
-func (e *Evaluation) AddMemory() {
+func (e *Evaluation) AddMemorySnapshot() {
 	memSnap := runtime.MemStats{}
 	runtime.ReadMemStats(&memSnap)
 

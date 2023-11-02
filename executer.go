@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"runtime"
 	"sort"
 	"time"
@@ -93,12 +94,14 @@ func (e *Executor) Run() []*data.Evaluation {
 			timeSlice = e.sort(timeSlice)
 			t := time.Since(start)
 
-			results[i].AddMemory()
+			results[i].AddMemorySnapshot()
 			results[i].AddExecTime(t)
 
-			sort.SliceIsSorted(timeSlice, func(i, j int) bool {
-				return timeSlice[j].Unix() < timeSlice[j].Unix()
-			})
+			if !sort.SliceIsSorted(timeSlice, func(i, j int) bool {
+				return timeSlice[i].Unix() < timeSlice[j].Unix()
+			}) {
+				log.Fatalf("%s,%s,%v: not sorted", results[i].Method, results[i].Distribution, size)
+			}
 
 			runtime.GC()
 		}
