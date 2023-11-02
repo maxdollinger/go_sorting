@@ -16,7 +16,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	executor := NewExecutor(100, []int{1000, 10_000, 100_000, 1_000_000})
 	executor := NewExecutor(100, []int{1000, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000})
 
 	testSortingFn(STANDARD_SORT, executor, out)
