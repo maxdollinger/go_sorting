@@ -2,17 +2,22 @@ package sorting
 
 import (
 	"sort"
+	"sync"
 	"time"
 )
 
 func RadixSortInplace(s []time.Time) []time.Time {
 
-	radixInplace(s, 10000000000)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	radixInplace(s, 1000000000, wg)
+	wg.Wait()
 
 	return s
 }
 
-func radixInplace(s []time.Time, faktor int) {
+func radixInplace(s []time.Time, faktor int, wg *sync.WaitGroup) {
+	defer wg.Done()
 
 	if sort.SliceIsSorted(s, func(i, j int) bool { return s[i].Unix() < s[j].Unix() }) {
 		return
@@ -43,13 +48,17 @@ func radixInplace(s []time.Time, faktor int) {
 	if faktor > 0 {
 		for i := range C {
 			if C[i] > 0 {
-				if C[i] > 1000 {
-					radixInplace(s[(T[i]-C[i]):T[i]], faktor)
+				if C[i] > 100 {
+					wg.Add(1)
+					go radixInplace(s[(T[i]-C[i]):T[i]], faktor, wg)
 				} else {
-					StandartSort(s[(T[i] - C[i]):T[i]])
+					radixStd(s[(T[i] - C[i]):T[i]])
 				}
 			}
 		}
 	}
+}
 
+func radixStd(s []time.Time) {
+	sort.Slice(s, func(i, j int) bool { return s[i].Unix() < s[j].Unix() })
 }
