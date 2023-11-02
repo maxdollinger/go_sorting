@@ -29,6 +29,6 @@ func (o *Output) Close() {
 
 func (o *Output) Write(form *data.Formater) error {
 	fmt.Print(form)
-	_, err := o.file.WriteString(form.String())
+	_, err := o.file.WriteString(form.RawData())
 	return err
 }
