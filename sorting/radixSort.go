@@ -1,38 +1,38 @@
 package sorting
 
-import "time"
+import (
+	"time"
+)
 
-const BUCKET_SIZE = 1000
+const BUCKET_SIZE = 10
+const UNIX_DIGITS = 1000000000
 
 func RadixSort(s []time.Time) []time.Time {
 
-	n := len(s)
-	faktor := 1
-	for i := 0; i < 4; i++ {
+	for d := 1; d <= UNIX_DIGITS; d *= BUCKET_SIZE {
 
-		C := [BUCKET_SIZE]int{}
+		C := [BUCKET_SIZE]uint{}
 		for i := range s {
-			C[extractKey(s[i], faktor)]++
+			C[extractKey(s[i], d)]++
 		}
 
 		for i := 1; i < BUCKET_SIZE; i++ {
 			C[i] += C[i-1]
 		}
 
-		sorted := make([]time.Time, n)
-		for i := (n - 1); i >= 0; i-- {
-			k := extractKey(s[i], faktor)
+		tmp := make([]time.Time, len(s))
+		for i := (len(s) - 1); i >= 0; i-- {
+			k := extractKey(s[i], d)
 			C[k]--
-			sorted[C[k]] = s[i]
+			tmp[C[k]] = s[i]
 		}
 
-		s = sorted
-		faktor *= BUCKET_SIZE
+		s = tmp
 	}
 
 	return s
 }
 
-func extractKey(t time.Time, f int) int {
-	return int(t.Unix()) / f % BUCKET_SIZE
+func extractKey(t time.Time, d int) int {
+	return int(t.Unix()) / d % BUCKET_SIZE
 }

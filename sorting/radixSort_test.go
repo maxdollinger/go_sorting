@@ -10,7 +10,7 @@ import (
 
 func TestRadixSortLoop(t *testing.T) {
 
-	s := data.Random(100)
+	s := data.Random(10000)
 	s = sorting.RadixSort(s)
 
 	if !sort.SliceIsSorted(s, func(i, j int) bool {
