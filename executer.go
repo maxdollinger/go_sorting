@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/maxdolliger/timesort/data"
-	"github.com/maxdolliger/timesort/sorting"
 )
 
 const (
@@ -67,14 +66,6 @@ func (e *Executor) UseSortingFn(fn string) *Executor {
 }
 
 func (e *Executor) sort(s []time.Time) []time.Time {
-	switch e.method {
-	case STANDARD_SORT:
-		return sorting.StandartSort(s)
-	case RADIX_SORT:
-		return sorting.RadixSort(s)
-	case RADIX_SORT_INPLACE:
-		return sorting.RadixSortInplace(s)
-	}
 
 	return s
 }

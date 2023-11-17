@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-const BUCKET_SIZE = 10
-const UNIX_DIGITS = 1000000000
+const BUCKET_SIZE = 10000
 
-func RadixSort(s []time.Time) []time.Time {
+func RadixSort(s []time.Time) {
 
+	tmp := make([]time.Time, len(s))
 	for d := 1; d <= UNIX_DIGITS; d *= BUCKET_SIZE {
 
-		C := [BUCKET_SIZE]uint{}
+		C := [BUCKET_SIZE]int{}
 		for i := range s {
 			C[extractKey(s[i], d)]++
 		}
@@ -20,17 +20,15 @@ func RadixSort(s []time.Time) []time.Time {
 			C[i] += C[i-1]
 		}
 
-		tmp := make([]time.Time, len(s))
 		for i := (len(s) - 1); i >= 0; i-- {
 			k := extractKey(s[i], d)
 			C[k]--
 			tmp[C[k]] = s[i]
 		}
 
-		s = tmp
+		copy(s, tmp)
 	}
 
-	return s
 }
 
 func extractKey(t time.Time, d int) int {

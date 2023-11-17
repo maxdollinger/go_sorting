@@ -8,10 +8,10 @@ import (
 	"github.com/maxdolliger/timesort/sorting"
 )
 
-func TestRadixSortLoop(t *testing.T) {
+func TestRadixSort(t *testing.T) {
 
 	s := data.Random(10000)
-	s = sorting.RadixSort(s)
+	sorting.RadixSort(s)
 
 	if !sort.SliceIsSorted(s, func(i, j int) bool {
 		return s[i].Unix() < s[j].Unix()
