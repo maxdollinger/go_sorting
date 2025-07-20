@@ -71,9 +71,8 @@ func (e *Evaluation) ExectimeMean() time.Duration {
 
 func (e *Evaluation) ExectimeMedian() float64 {
 	s := make([]time.Duration, len(e.ExectimeRaw))
-	for i := range e.ExectimeRaw {
-		s[i] = e.ExectimeRaw[i]
-	}
+	copy(s, e.ExectimeRaw)
+
 	sort.Slice(s, func(i, j int) bool { return s[i] < s[j] })
 
 	l := len(s)

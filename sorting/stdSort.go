@@ -2,14 +2,10 @@ package sorting
 
 import (
 	"sort"
-	"time"
 )
 
-func StandartSort(s []time.Time) []time.Time {
-
+func StandartSort[S Sortable](s []S) {
 	sort.Slice(s, func(i, j int) bool {
-		return s[i].Unix() < s[j].Unix()
+		return s[i].SortValue() < s[j].SortValue()
 	})
-
-	return s
 }

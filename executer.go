@@ -2,101 +2,86 @@ package main
 
 import (
 	"log"
+	"reflect"
 	"runtime"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/maxdolliger/timesort/data"
+	"github.com/maxdolliger/timesort/sorting"
 )
 
-const (
-	RANDOM      string = "random"
-	NEAR_SORTED string = "near_sorted"
-	SORTED      string = "sorted"
-	REVERSED    string = "reversed"
-	DBL_SORTED  string = "sorted_doubled"
+type (
+	sortingFn[T sorting.Sortable]       func(s []T)
+	randomGenerator[T sorting.Sortable] func(n int) []T
 )
 
-const (
-	STANDARD_SORT      string = "standard"
-	RADIX_SORT         string = "radix"
-	RADIX_SORT_INPLACE string = "radix_inplace"
-)
-
-type Executor struct {
-	runs         int
-	inputSizes   []int
-	distribution string
-	method       string
+type Executor[T sorting.Sortable] struct {
+	runs       int
+	inputSizes []int
+	method     sortingFn[T]
+	generator  randomGenerator[T]
 }
 
-func NewExecutor(runs int, sizes []int) *Executor {
-	return &Executor{
+func NewExecutor[T sorting.Sortable](sortingFn sortingFn[T], runs int, sizes []int) *Executor[T] {
+	return &Executor[T]{
 		runs:       runs,
 		inputSizes: sizes,
+		method:     sortingFn,
 	}
 }
 
-func (e *Executor) UseGenerator(gen string) *Executor {
-	e.distribution = gen
-	return e
-}
-
-func (e *Executor) generateSlice(n int) []time.Time {
-
-	switch e.distribution {
-	case RANDOM:
-		return data.Random(n)
-	case NEAR_SORTED:
-		return data.NearSorted(n)
-	case SORTED:
-		return data.Sorted(n)
-	case REVERSED:
-		return data.Reversed(n)
-	case DBL_SORTED:
-		return data.SortedDoubled(n)
-	}
-
-	return []time.Time{}
-}
-
-func (e *Executor) UseSortingFn(fn string) *Executor {
-	e.method = fn
-	return e
-}
-
-func (e *Executor) sort(s []time.Time) []time.Time {
-
-	return s
-}
-
-func (e *Executor) Run() []*data.Evaluation {
-
+func (e *Executor[T]) Run(generateFn randomGenerator[T]) []*data.Evaluation {
 	results := make([]*data.Evaluation, len(e.inputSizes))
 
+	distribution := getFunctionName(generateFn)
+	sortingMethod := getFunctionName(e.method)
+
+	log.Printf("Distribution: %s", distribution)
+	log.Printf("Sorting method: %s", sortingMethod)
+
 	for i, size := range e.inputSizes {
-		results[i] = data.NewEvaluation(size, e.distribution, e.method)
+		results[i] = data.NewEvaluation(size, distribution, sortingMethod)
 
 		for j := 0; j < e.runs; j++ {
 
-			timeSlice := e.generateSlice(size)
+			dataToSort := generateFn(size)
 
 			start := time.Now()
-			timeSlice = e.sort(timeSlice)
-			t := time.Since(start)
-
+			e.method(dataToSort)
+			execTime := time.Since(start)
 			results[i].AddMemorySnapshot()
-			results[i].AddExecTime(t)
+			results[i].AddExecTime(execTime)
 
-			if !sort.SliceIsSorted(timeSlice, func(i, j int) bool {
-				return timeSlice[i].Unix() < timeSlice[j].Unix()
+			if !sort.SliceIsSorted(dataToSort, func(i, j int) bool {
+				return dataToSort[i].SortValue() < dataToSort[j].SortValue()
 			}) {
 				log.Fatalf("%s,%s,%v: not sorted", results[i].Method, results[i].Distribution, size)
 			}
+
+			log.Printf("DONE -> size: %d run: %d t: %s \n", size, j+1, execTime)
 
 			runtime.GC()
 		}
 	}
 
 	return results
+}
+
+func getFunctionName(fn interface{}) string {
+	name := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+	if i := strings.LastIndex(name, "/"); i != -1 {
+		name = name[i+1:]
+	}
+
+	if i := strings.Index(name, "."); i != -1 {
+		name = name[i+1:]
+	}
+
+	if i := strings.Index(name, "["); i != -1 {
+		name = name[:i]
+	}
+
+	return name
 }

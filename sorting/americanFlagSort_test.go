@@ -1,6 +1,7 @@
 package sorting_test
 
 import (
+	"fmt"
 	"sort"
 	"testing"
 
@@ -8,14 +9,17 @@ import (
 	"github.com/maxdolliger/timesort/sorting"
 )
 
-func TestRadixInplace(t *testing.T) {
+func TestAmericanFlagSort(t *testing.T) {
+	s := data.Random(20000)
 
-	s := data.Random(10000)
+	fmt.Println(s)
 
-	sorting.RadixSortInplace(s)
+	sorting.AmericanFlagSort(s)
+
+	fmt.Println(s)
 
 	isSorted := sort.SliceIsSorted(s, func(i, j int) bool {
-		return s[i].Unix() < s[j].Unix()
+		return s[i].SortValue() < s[j].SortValue()
 	})
 
 	if !isSorted {

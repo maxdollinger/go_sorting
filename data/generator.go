@@ -3,39 +3,38 @@ package data
 import (
 	"math"
 	"math/rand"
-	"time"
 )
 
-type SliceGenerator struct{}
+// Create slices of randomized times
 
-func NewSliceGenerator() *SliceGenerator {
-	return &SliceGenerator{}
+type SortableNumber int64
+
+func (n SortableNumber) SortValue() int64 {
+	return int64(n)
 }
 
-func Sorted(n int) []time.Time {
-	s := make([]time.Time, n)
-	t := time.Now().UTC()
+func Sorted(n int) []SortableNumber {
+	s := make([]SortableNumber, n)
 
 	for i := range s {
-		s[i] = t.Add(time.Second * time.Duration(i))
+		s[i] = SortableNumber(i)
 	}
 
 	return s
 }
 
-func Reversed(n int) []time.Time {
-	s := make([]time.Time, n)
-	t := time.Now().UTC()
+func Reversed(n int) []SortableNumber {
+	s := make([]SortableNumber, n)
 
 	for i := range s {
-		s[i] = t.Add(time.Second * time.Duration(n-i))
+		s[i] = SortableNumber(n - i)
 	}
 
 	return s
 }
 
-func SortedDoubled(n int) []time.Time {
-	s := make([]time.Time, 0, n)
+func SortedDoubled(n int) []SortableNumber {
+	s := make([]SortableNumber, 0, n)
 
 	s1 := Sorted(int(math.Floor(float64(n) / 2)))
 	s = append(s, s1...)
@@ -46,19 +45,18 @@ func SortedDoubled(n int) []time.Time {
 	return s
 }
 
-func Random(n int) []time.Time {
-	s := make([]time.Time, n)
-	t := time.Now().UTC().AddDate(-25, 0, 0)
+func Random(n int) []SortableNumber {
+	s := make([]SortableNumber, n)
 
 	for i := range s {
-		rnd := rand.Int63n(438300 * time.Hour.Nanoseconds())
-		s[i] = t.Add(time.Duration(rnd))
+		rnd := rand.Int63n(int64(n))
+		s[i] = SortableNumber(rnd)
 	}
 
 	return s
 }
 
-func NearSorted(n int) []time.Time {
+func NearSorted(n int) []SortableNumber {
 	s := Sorted(n)
 
 	for i := 0; i < n; i++ {

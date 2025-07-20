@@ -9,12 +9,11 @@ import (
 )
 
 func TestRadixSort(t *testing.T) {
-
 	s := data.Random(10000)
 	sorting.RadixSort(s)
 
 	if !sort.SliceIsSorted(s, func(i, j int) bool {
-		return s[i].Unix() < s[j].Unix()
+		return s[i].SortValue() < s[j].SortValue()
 	}) {
 		t.Log(s)
 		t.Fatalf("not sorted")
