@@ -18,6 +18,8 @@ The project implements and benchmarks the following sorting algorithms:
 - **American Flag Sort (Parallel)** - Multi-threaded version of American Flag Sort
 - **Standard Sort** - Go's built-in `sort.Slice()` implementation
 
+Radix sort and American Flag sort are based on the Paper: McIlroy, D. (1993). Engineering Radix Sort.
+
 ### Data Generators
 
 Multiple data distribution patterns are available for testing:

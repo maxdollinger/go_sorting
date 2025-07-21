@@ -22,10 +22,8 @@ func AmericanFlagSort[T Sortable](s []T) {
 		digits *= int64(AFS_RADIX)
 	}
 
-	// Initialize stack with the entire slice
 	stack := []WorkItem[T]{{bucket: s[:], digits: digits}}
 
-	// Process stack until empty
 	for len(stack) > 0 {
 		// Pop work item from stack
 		item := stack[len(stack)-1]
