@@ -32,17 +32,19 @@ Multiple data distribution patterns are available for testing:
 
 ### Prerequisites
 
-- Go 1.21.0 or higher
+- Go 1.24.5 or higher
 
 ### Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/maxdolliger/go_sorting.git
 cd go_sorting
 ```
 
 2. Build the project:
+
 ```bash
 go build
 ```
@@ -78,19 +80,10 @@ The program generates:
 
 ## Benchmarking
 
-### Test Sizes
-
-Default test sizes range from small (10 elements) to large (1,000,000 elements):
-- 10
-- 100  
-- 1,000
-- 10,000
-- 100,000
-- 1,000,000
-
 ### Metrics Collected
 
 For each algorithm and input size:
+
 - **Execution Time**: Precise timing using `time.Since()`
 - **Memory Usage**: Memory snapshots during execution
 - **Correctness Verification**: Ensures data is properly sorted
@@ -122,45 +115,6 @@ go_sorting/
     └── stdSort.go           # Standard library wrapper
 ```
 
-## Extending the Project
-
-### Adding New Sorting Algorithms
-
-1. Implement the algorithm in the `sorting/` directory
-2. Follow the `SortingFn[T sorting.Sortable]` function signature
-3. Add the algorithm to the benchmark suite in `main.go`
-
-### Adding New Data Generators
-
-1. Create generator functions in `data/generator.go`
-2. Implement the `DataGenerator[T sorting.Sortable]` interface
-3. Return slices of `SortableNumber` or custom `Sortable` types
-
-### Custom Data Types
-
-Implement the `Sortable` interface for custom data types:
-
-```go
-type Sortable interface {
-    SortValue() int64
-}
-```
-
-## Performance Considerations
-
-- **Memory Management**: Garbage collection is forced between runs
-- **Verification**: Each run includes correctness checking
-- **Isolation**: Each algorithm runs independently
-- **Reproducibility**: Consistent random seeding for repeatable results
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes
-4. Add appropriate tests
-5. Submit a pull request
-
 ## License
 
 This project is licensed under the GLWTS (Good Luck With That Shit) Public License. See `LICENSE.md` for details.
@@ -171,4 +125,5 @@ Created by [@maxdolliger](https://github.com/maxdolliger)
 
 ---
 
-*Note: This benchmarking suite is designed for educational and research purposes. Results may vary based on hardware, Go version, and system load.* 
+_Note: This benchmarking suite is designed for educational and research purposes. Results may vary based on hardware, Go version, and system load._
+
