@@ -10,13 +10,12 @@ import (
 )
 
 func main() {
-	sortingSliceSizes := []int{10, 100, 1000, 10_000, 100_000, 1_000_000}
-	runsPerSize := 1
+	sortingSliceSizes := []int{10, 100, 1000, 10_000, 100_000, 1_000_000, 10_000_000}
+	runsPerSize := 5
 
 	results := make([]*data.Evaluation, 0, len(sortingSliceSizes)*5)
 	exec := NewExecutor(data.Random, runsPerSize, sortingSliceSizes)
 
-	results = append(results, exec.Run(sorting.InsertionSort)...)
 	results = append(results, exec.Run(sorting.RadixSort)...)
 	results = append(results, exec.Run(sorting.AmericanFlagSort)...)
 	results = append(results, exec.Run(sorting.AmericanFlagSortParallel)...)

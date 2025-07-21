@@ -2,10 +2,6 @@ package sorting
 
 import "sync"
 
-const (
-	AFS_RADIX = 1000
-)
-
 // sorts each subslice of s in a separate goroutine for needs significantly more memory for larger slices
 func AmericanFlagSortParallel[T Sortable](s []T) {
 	if len(s) == 0 {

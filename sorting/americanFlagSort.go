@@ -6,7 +6,11 @@ type WorkItem[T Sortable] struct {
 	digits int64 // current digit position
 }
 
-func AmericanFlagSort[T Sortable](s []T) {
+const (
+	AFS_RADIX = 5000
+)
+
+func AmericanFlagSort[S Sortable](s []S) {
 	if len(s) == 0 {
 		return
 	}
@@ -22,32 +26,36 @@ func AmericanFlagSort[T Sortable](s []T) {
 		digits *= int64(AFS_RADIX)
 	}
 
-	stack := []WorkItem[T]{{bucket: s[:], digits: digits}}
+	stack := []WorkItem[S]{{bucket: s[:], digits: digits}}
+
+	H := [AFS_RADIX]int{}
+	T := [AFS_RADIX]int{}
+	C := [AFS_RADIX]int{}
 
 	for len(stack) > 0 {
 		// Pop work item from stack
 		item := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 
-		afsWorkerIterative(item.bucket, item.digits, &stack)
+		clear(C[:])
+		afsWorkerIterative(item.bucket, item.digits, &C, &H, &T, &stack)
 	}
 }
 
-func afsWorkerIterative[S Sortable](s []S, d int64, stack *[]WorkItem[S]) {
+func afsWorkerIterative[S Sortable](s []S, d int64, C *[AFS_RADIX]int, H *[AFS_RADIX]int, T *[AFS_RADIX]int, stack *[]WorkItem[S]) {
 	if len(s) <= 1 || d == 0 {
 		return
 	}
 
 	// Count frequency of each digit
-	C := [AFS_RADIX]int{}
 	for i := range s {
 		key := afsKey(s[i], d)
 		C[key]++
 	}
 
 	// Calculate start and end indices for each bucket (relative to subslice)
-	H := [AFS_RADIX]int{0}
-	T := [AFS_RADIX]int{C[0]}
+	H[0] = 0
+	T[0] = C[0]
 	for i := 1; i < AFS_RADIX; i++ {
 		H[i] = T[i-1]
 		T[i] = H[i] + C[i]
@@ -66,9 +74,7 @@ func afsWorkerIterative[S Sortable](s []S, d int64, stack *[]WorkItem[S]) {
 	d = d / AFS_RADIX
 	if d > 0 {
 		for i := len(C) - 1; i >= 0; i-- {
-			if C[i] > 1 {
-				*stack = append(*stack, WorkItem[S]{bucket: s[(T[i] - C[i]):T[i]], digits: d})
-			}
+			*stack = append(*stack, WorkItem[S]{bucket: s[(T[i] - C[i]):T[i]], digits: d})
 		}
 	}
 }
