@@ -5,8 +5,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/maxdolliger/timesort/data"
-	"github.com/maxdolliger/timesort/sorting"
+	"github.com/maxdolliger/go_sorting/data"
+	"github.com/maxdolliger/go_sorting/sorting"
 )
 
 func TestAmericanFlagSort(t *testing.T) {
