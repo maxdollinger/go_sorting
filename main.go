@@ -64,7 +64,7 @@ func persitsResults(output string, generatorName string) error {
 	fileName := fmt.Sprintf("%s_%s.txt", generatorName, time.Now().Format("2006-01-02_15-04-05"))
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 6644)
 	if err != nil {
-		return fmt.Errorf("Error opening file: %w", err)
+		return fmt.Errorf("error opening file \"%s\": %w", fileName, err)
 	}
 	defer func() {
 		if closeErr := file.Close(); closeErr != nil {
@@ -75,7 +75,7 @@ func persitsResults(output string, generatorName string) error {
 
 	_, err = file.WriteString(output)
 	if err != nil {
-		return fmt.Errorf("Error writing to file: %w", err)
+		return fmt.Errorf("error opening file \"%s\": %w", fileName, err)
 	}
 
 	return nil
