@@ -74,6 +74,7 @@ func (f *Formater) buildTable(rows [][]string, colWidths []int) string {
 
 	// Data rows
 	for i := 1; i < len(rows); i++ {
+		// Separator for each input size
 		if i > 1 && rows[i][2] != rows[i-1][2] {
 			result.WriteString(buildBorder(colWidths, "├", "┼", "┤"))
 			result.WriteString("\n")
@@ -125,7 +126,7 @@ func buildBorder(colWidths []int, left, middle, right string) string {
 	result.WriteString(left)
 
 	for i, width := range colWidths {
-		result.WriteString(strings.Repeat("─", width+2)) // +2 for left and right padding
+		result.WriteString(strings.Repeat("─", width+2))
 		if i < len(colWidths)-1 {
 			result.WriteString(middle)
 		}
