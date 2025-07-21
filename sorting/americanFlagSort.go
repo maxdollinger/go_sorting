@@ -1,6 +1,11 @@
 package sorting
 
-// sorts each subslice of s in a separate goroutine for needs significantly more memory for larger slices
+// WorkItem represents a slice segment to be processed
+type WorkItem[T Sortable] struct {
+	bucket []T
+	digits int64 // current digit position
+}
+
 func AmericanFlagSort[T Sortable](s []T) {
 	if len(s) == 0 {
 		return
@@ -17,10 +22,20 @@ func AmericanFlagSort[T Sortable](s []T) {
 		digits *= int64(AFS_RADIX)
 	}
 
-	afsWorker(s, digits)
+	// Initialize stack with the entire slice
+	stack := []WorkItem[T]{{bucket: s[:], digits: digits}}
+
+	// Process stack until empty
+	for len(stack) > 0 {
+		// Pop work item from stack
+		item := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		afsWorkerIterative(item.bucket, item.digits, &stack)
+	}
 }
 
-func afsWorker[S Sortable](s []S, d int64) {
+func afsWorkerIterative[S Sortable](s []S, d int64, stack *[]WorkItem[S]) {
 	if len(s) <= 1 || d == 0 {
 		return
 	}
@@ -32,16 +47,16 @@ func afsWorker[S Sortable](s []S, d int64) {
 		C[key]++
 	}
 
-	// Calcutlate start and end indices for each bucket
+	// Calculate start and end indices for each bucket (relative to subslice)
 	H := [AFS_RADIX]int{0}
 	T := [AFS_RADIX]int{C[0]}
 	for i := 1; i < AFS_RADIX; i++ {
 		H[i] = T[i-1]
 		T[i] = H[i] + C[i]
 	}
+
 	// Partition elements into buckets using in-place swapping
 	for i := range s {
-		// k Bucket key and; H[k] start idx of bucket; T[k] end idx of bucket
 		k := afsKey(s[i], d)
 		for H[k] < T[k] && i != H[k] {
 			s[i], s[H[k]] = s[H[k]], s[i]
@@ -49,10 +64,13 @@ func afsWorker[S Sortable](s []S, d int64) {
 			k = afsKey(s[i], d)
 		}
 	}
+
 	d = d / AFS_RADIX
 	if d > 0 {
-		for i, c := range C {
-			afsWorker(s[(T[i]-c):T[i]], d)
+		for i := len(C) - 1; i >= 0; i-- {
+			if C[i] > 1 {
+				*stack = append(*stack, WorkItem[S]{bucket: s[(T[i] - C[i]):T[i]], digits: d})
+			}
 		}
 	}
 }

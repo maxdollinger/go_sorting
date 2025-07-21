@@ -45,6 +45,7 @@ func afsWorkerParallel[S Sortable](s []S, d int64, wg *sync.WaitGroup) {
 		H[i] = T[i-1]
 		T[i] = H[i] + C[i]
 	}
+
 	for i := range s {
 		k := afsKey(s[i], d)
 		for H[k] < T[k] && i != H[k] {
@@ -53,6 +54,7 @@ func afsWorkerParallel[S Sortable](s []S, d int64, wg *sync.WaitGroup) {
 			k = afsKey(s[i], d)
 		}
 	}
+
 	d = d / AFS_RADIX
 	if d > 0 {
 		for i, c := range C {

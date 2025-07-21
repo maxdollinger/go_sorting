@@ -76,7 +76,10 @@ func (e *Evaluation) ExectimeMedian() float64 {
 	sort.Slice(s, func(i, j int) bool { return s[i] < s[j] })
 
 	l := len(s)
-	if l%2 != 0 {
+
+	if l == 1 {
+		return float64(s[0])
+	} else if l%2 != 0 {
 		return float64(s[(l/2)-1])
 	} else {
 		return (float64(s[(l/2)-1]) + float64(s[l/2])) / 2
@@ -114,13 +117,13 @@ func (e *Evaluation) ExectimeP(p float64) float64 {
 	n := float64(l)
 	np := n * p
 
+	i := clamp(int(math.Floor(np))-1, 0, l-1)
+
 	if math.Mod(np, 1.0) == 0 {
-		i := int(math.Floor(np) + 1)
 		return float64(s[i])
 	} else {
 		d := math.Mod(np, 1.0)
-		i := int(math.Floor(np))
-		i1 := int(math.Ceil(np))
+		i1 := clamp(int(math.Ceil(np)-1), 0, l-1)
 
 		xi := float64(s[i])
 		xi1 := float64(s[i1])
@@ -139,4 +142,14 @@ func (e *Evaluation) ExectimeSD() time.Duration {
 	vari := devSqSum / float64(len(e.ExectimeRaw))
 
 	return time.Duration(math.Sqrt(vari))
+}
+
+func clamp(n, min, max int) int {
+	if n < min {
+		return min
+	} else if n > max {
+		return max
+	} else {
+		return n
+	}
 }

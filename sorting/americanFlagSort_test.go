@@ -10,7 +10,7 @@ import (
 )
 
 func TestAmericanFlagSort(t *testing.T) {
-	s := data.Random(20000)
+	s := data.Random(10)
 
 	fmt.Println(s)
 

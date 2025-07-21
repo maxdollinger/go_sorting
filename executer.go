@@ -13,43 +13,42 @@ import (
 )
 
 type (
-	sortingFn[T sorting.Sortable]       func(s []T)
-	randomGenerator[T sorting.Sortable] func(n int) []T
+	SortingFn[T sorting.Sortable]     func(s []T)
+	DataGenerator[T sorting.Sortable] func(n int) []T
 )
 
 type Executor[T sorting.Sortable] struct {
 	runs       int
 	inputSizes []int
-	method     sortingFn[T]
-	generator  randomGenerator[T]
+	sortingFn  SortingFn[T]
+	generator  DataGenerator[T]
 }
 
-func NewExecutor[T sorting.Sortable](sortingFn sortingFn[T], runs int, sizes []int) *Executor[T] {
+func NewExecutor[T sorting.Sortable](dataGenerator DataGenerator[T], runs int, sizes []int) *Executor[T] {
 	return &Executor[T]{
 		runs:       runs,
 		inputSizes: sizes,
-		method:     sortingFn,
+		generator:  dataGenerator,
 	}
 }
 
-func (e *Executor[T]) Run(generateFn randomGenerator[T]) []*data.Evaluation {
+func (e *Executor[T]) Run(sortingFn SortingFn[T]) []*data.Evaluation {
 	results := make([]*data.Evaluation, len(e.inputSizes))
 
-	distribution := getFunctionName(generateFn)
-	sortingMethod := getFunctionName(e.method)
+	distribution := getFunctionName(e.generator)
+	sortingMethod := getFunctionName(sortingFn)
 
-	log.Printf("Distribution: %s", distribution)
-	log.Printf("Sorting method: %s", sortingMethod)
+	log.Printf("Starting runs for %s with %s data ...", sortingMethod, distribution)
 
 	for i, size := range e.inputSizes {
 		results[i] = data.NewEvaluation(size, distribution, sortingMethod)
 
 		for j := 0; j < e.runs; j++ {
 
-			dataToSort := generateFn(size)
+			dataToSort := e.generator(size)
 
 			start := time.Now()
-			e.method(dataToSort)
+			sortingFn(dataToSort)
 			execTime := time.Since(start)
 			results[i].AddMemorySnapshot()
 			results[i].AddExecTime(execTime)
@@ -60,13 +59,17 @@ func (e *Executor[T]) Run(generateFn randomGenerator[T]) []*data.Evaluation {
 				log.Fatalf("%s,%s,%v: not sorted", results[i].Method, results[i].Distribution, size)
 			}
 
-			log.Printf("DONE -> size: %d run: %d t: %s \n", size, j+1, execTime)
-
 			runtime.GC()
 		}
 	}
 
+	log.Printf("DONE")
+
 	return results
+}
+
+func (e *Executor[T]) GetGeneratorName() string {
+	return getFunctionName(e.generator)
 }
 
 func getFunctionName(fn interface{}) string {
