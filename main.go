@@ -25,8 +25,7 @@ func main() {
 	formater := data.NewFormater(results)
 	fmt.Println(formater.TableString())
 
-	output := fmt.Sprintf("%s\n", formater.String())
-	err := persitsResults(output, exec.GetGeneratorName())
+	err := persitsResults(formater.String(), exec.GetGeneratorName())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing to file: %v\n", err)
 		os.Exit(1)
