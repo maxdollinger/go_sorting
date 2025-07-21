@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/maxdolliger/go_sorting/data"
@@ -10,16 +11,42 @@ import (
 )
 
 func main() {
-	sortingSliceSizes := []int{10, 100, 1000, 10_000, 100_000, 1_000_000}
+	sortingSliceSizes := []int{10, 100, 1000, 10_000, 100_000, 1_000_000, 10_000_000}
 	runsPerSize := 5
 
 	results := make([]*data.Evaluation, 0, len(sortingSliceSizes)*5)
 	exec := NewExecutor(data.Random, runsPerSize, sortingSliceSizes)
 
-	results = append(results, exec.Run(sorting.AmericanFlagSort)...)
-	results = append(results, exec.Run(sorting.RadixSort)...)
-	results = append(results, exec.Run(sorting.AmericanFlagSortParallel)...)
-	results = append(results, exec.Run(sorting.StandartSort)...)
+	// Parallel runs for speed testing. Memory meassurement is useless for now
+	ch := make(chan []*data.Evaluation)
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
+	go func() {
+		ch <- exec.Run(sorting.AmericanFlagSort)
+	}()
+	wg.Add(1)
+	go func() {
+		ch <- exec.Run(sorting.RadixSort)
+	}()
+	wg.Add(1)
+	go func() {
+		ch <- exec.Run(sorting.AmericanFlagSortParallel)
+	}()
+	wg.Add(1)
+	go func() {
+		ch <- exec.Run(sorting.StandartSort)
+	}()
+
+	go func() {
+		for result := range ch {
+			results = append(results, result...)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+	close(ch)
 
 	formater := data.NewFormater(results)
 	fmt.Println(formater.TableString())
