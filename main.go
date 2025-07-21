@@ -19,33 +19,33 @@ func main() {
 
 	// Parallel runs for speed testing. Memory meassurement is useless for now
 	ch := make(chan []*data.Evaluation)
-	wg := sync.WaitGroup{}
+	resCount := 0
 
-	wg.Add(1)
+	resCount++
 	go func() {
 		ch <- exec.Run(sorting.AmericanFlagSort)
 	}()
-	wg.Add(1)
+	resCount++
 	go func() {
 		ch <- exec.Run(sorting.RadixSort)
 	}()
-	wg.Add(1)
+	resCount++
 	go func() {
 		ch <- exec.Run(sorting.AmericanFlagSortParallel)
 	}()
-	wg.Add(1)
+	resCount++
 	go func() {
 		ch <- exec.Run(sorting.StandartSort)
 	}()
 
-	go func() {
-		for result := range ch {
-			results = append(results, result...)
-			wg.Done()
+	for result := range ch {
+		results = append(results, result...)
+		resCount--
+		if resCount == 0 {
+			break
 		}
-	}()
+	}
 
-	wg.Wait()
 	close(ch)
 
 	formater := data.NewFormater(results)
