@@ -10,6 +10,7 @@ const (
 	AFS_RADIX = 5000
 )
 
+// Experimeting with none recursive implementation
 func AmericanFlagSort[S Sortable](s []S) {
 	if len(s) == 0 {
 		return
@@ -26,7 +27,8 @@ func AmericanFlagSort[S Sortable](s []S) {
 		digits *= int64(AFS_RADIX)
 	}
 
-	stack := []WorkItem[S]{{bucket: s[:], digits: digits}}
+	stack := make([]WorkItem[S], 0, AFS_RADIX*2)
+	stack = append(stack, WorkItem[S]{bucket: s, digits: digits})
 
 	H := [AFS_RADIX]int{}
 	T := [AFS_RADIX]int{}

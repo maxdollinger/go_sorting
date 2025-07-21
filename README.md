@@ -14,7 +14,7 @@ The project implements and benchmarks the following sorting algorithms:
 
 - **Insertion Sort** - Simple comparison-based algorithm, efficient for small datasets
 - **Radix Sort** - Non-comparative integer sorting algorithm
-- **American Flag Sort** - In-place variant of radix sort
+- **American Flag Sort** - In-place variant of radix sort (Experimental with non-recursive implementation)
 - **American Flag Sort (Parallel)** - Multi-threaded version of American Flag Sort
 - **Standard Sort** - Go's built-in `sort.Slice()` implementation
 
